@@ -30,6 +30,7 @@ const RegisterForm = () => {
         } catch (error) {
             console.error("An error occured",error)
         }
+    }
     return (
         <main className="flex lg:h-[100vh]">
             <div className="w-full lg:w-[60%] p-8 md:p-14 flex items-center justify-center lg:justify-start">
