@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { auth } from "../firebase/firebase";
@@ -10,7 +10,10 @@ const RegisterForm = () => {
     const signupHandler=async()=>{
         if(!username||!email||!password)return;
         try {
-            const user=await createUserWithEmailAndPassword(auth,email,password)
+            const user=await createUserWithEmailAndPassword(auth,email,password);
+            await updateProfile(auth.currentUser,{
+                displayName:username
+            });
             console.log(user);
         } catch (error) {
             console.log("An error occured",error)
