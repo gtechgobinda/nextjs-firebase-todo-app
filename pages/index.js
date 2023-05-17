@@ -22,7 +22,10 @@ const arr = [
 import { db } from "@/firebase/firebase";
 import {
     addDoc,
-    collection
+    collection,
+    getDocs,
+    query,
+    where
 } from "firebase/firestore";
 
 export default function Home() {
@@ -34,18 +37,38 @@ export default function Home() {
     if (!isLoading && !authUser) {
       router.push("/login");
     }
+    if (!!authUser) {
+      fetchTodos(authUser.uid);
+    }
   }, [authUser, isLoading]);
 
   const addToDo = async () => {
     try {
       const docRef = await addDoc(collection(db, "todos"), {
-        owner:authUser.uid,
-        content:todoInput,
-        completed:false,
+        owner: authUser.uid,
+        content: todoInput,
+        completed: false,
       });
       console.log("Document written with ID: ", docRef.id);
+
+      fetchTodos(authUser.uid);
+      setTodoInput("")
     } catch (error) {
-        console.error(error)
+      console.error(error);
+    }
+  };
+  const fetchTodos = async (uid) => {
+    try {
+      const q = query(collection(db, "todos"), where("owner", "==", uid));
+      const querySnapshot = await getDocs(q);
+      let data =[]
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+        data.push({...doc.data(),id:doc.id})
+      });
+      setTodos(data);
+    } catch (error) {
+      console.error(error);
     }
   };
   return !authUser ? (
@@ -74,22 +97,26 @@ export default function Home() {
               value={todoInput}
               onChange={(e) => setTodoInput(e.target.value)}
             />
-            <button className="w-[60px] h-[60px] rounded-md bg-black flex justify-center items-center cursor-pointer transition-all duration-300 hover:bg-black/[0.8]" onClick={addToDo}>
+            <button
+              className="w-[60px] h-[60px] rounded-md bg-black flex justify-center items-center cursor-pointer transition-all duration-300 hover:bg-black/[0.8]"
+              onClick={addToDo}
+            >
               <AiOutlinePlus size={30} color="#fff" />
             </button>
           </div>
         </div>
         <div className="my-10">
-          {arr.map((todo, index) => (
-            <div className="flex items-center justify-between mt-4">
+          {todos.length>0 && todos.map((todo, index) => (
+            <div key={todo.id}className="flex items-center justify-between mt-4">
               <div className="flex items-center gap-3">
                 <input
-                  id={`todo-${index}`}
+                  id={`todo-${todo.id}`}
                   type="checkbox"
                   className="w-4 h-4 accent-green-400 rounded-lg"
+                  checked={todo.completed}
                 />
-                <label htmlFor={`todo-${index}`} className="font-medium">
-                  This is my first todo
+                <label htmlFor={`todo-${todo.id}`} className="font-medium">
+                 {todo.content}
                 </label>
               </div>
 
