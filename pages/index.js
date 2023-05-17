@@ -1,14 +1,29 @@
 import Loader from "@/components/Loader";
 import { useAuth } from "@/firebase/auth";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { GoSignOut } from "react-icons/go";
 import { MdDeleteForever } from "react-icons/md";
 const arr = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 ];
+// import {
+//     collection,
+//     addDoc,
+//     getDocs,
+//     where,
+//     query,
+//     deleteDoc,
+//     updateDoc,
+//     doc
+// } from "firebase/firestore"
+// import { db } from "@/firebase/firebase";
+
+
 export default function Home() {
+    const[todoInput,setTodoInput]=useState("");
+    const[todos,setTodos]=useState([])
     const { authUser, isLoading,signOut} = useAuth();
     const router = useRouter();
     useEffect(() => {
