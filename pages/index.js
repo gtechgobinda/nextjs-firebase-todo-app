@@ -23,6 +23,8 @@ import { db } from "@/firebase/firebase";
 import {
     addDoc,
     collection,
+    deleteDoc,
+    doc,
     getDocs,
     query,
     where
@@ -57,6 +59,14 @@ export default function Home() {
       console.error(error);
     }
   };
+  const deleteTodo=async(docId)=>{
+    try {
+        await deleteDoc(doc(db,"todos",docId))
+        fetchTodos(authUser.uid);
+    } catch (error) {
+        console.error(error);
+    }
+  }
   const fetchTodos = async (uid) => {
     try {
       const q = query(collection(db, "todos"), where("owner", "==", uid));
@@ -124,6 +134,7 @@ export default function Home() {
                 <MdDeleteForever
                   size={24}
                   className="text-red-400 hover:text-red-600 cursor-pointer"
+                  onClick={()=>deleteTodo(todo.id)}
                 />
               </div>
             </div>
